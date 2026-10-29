@@ -8,7 +8,7 @@ export const company = {
   email: "utkrixtechnologies@gmail.com",
   phone: "9768682231",
   // Taken from the supplied banner. Replace if the company wording changes.
-  tagline: "Your trusted IT partner",
+  tagline: "Engineering the Exceptional",
   motto: ["Ideas", "Code", "Real solutions"],
 };
 
