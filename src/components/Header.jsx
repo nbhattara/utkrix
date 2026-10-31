@@ -3,10 +3,12 @@ import { navItems } from "../config/site.js";
 import Logo from "./Logo.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import Icon from "./Icon.jsx";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function Header({ theme, onToggleTheme, activeId }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
+  const { user, signOut } = useAuth();
 
   // Close the mobile menu with Escape and return focus to the menu button.
   useEffect(() => {
@@ -34,6 +36,25 @@ export default function Header({ theme, onToggleTheme, activeId }) {
                 </a>
               </li>
             ))}
+            {user ? (
+              <li className="nav__account">
+                <a className="nav__user nav__dashboard-link" href="#/dashboard" title={user.email} onClick={() => setOpen(false)}>
+                  Dashboard
+                </a>
+                <button
+                  className="nav__logout"
+                  type="button"
+                  onClick={() => { signOut(); setOpen(false); window.location.hash = "#home"; }}
+                >
+                  Sign out
+                </button>
+              </li>
+            ) : (
+              <>
+                <li><a href="#/login" onClick={() => setOpen(false)}>Sign in</a></li>
+                <li><a className="nav__signup" href="#/register" onClick={() => setOpen(false)}>Create account</a></li>
+              </>
+            )}
           </ul>
         </nav>
 

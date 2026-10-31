@@ -24,6 +24,7 @@ export const assets = {
 export const navItems = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
+  { id: "courses", label: "Courses" },
   { id: "projects", label: "Projects" },
   { id: "contact", label: "Contact" },
 ];

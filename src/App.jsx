@@ -14,7 +14,10 @@ import Stats from "./sections/Stats.jsx";
 import About from "./sections/About.jsx";
 import MissionVision from "./sections/MissionVision.jsx";
 import Projects from "./sections/Projects.jsx";
+import Courses from "./sections/Courses.jsx";
 import Contact from "./sections/Contact.jsx";
+import AuthPage from "./components/AuthPage.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 
 // Legal pages: route (hash) -> document. Add more here if needed.
 const legalDocs = {
@@ -25,16 +28,18 @@ const navIds = navItems.map((n) => n.id);
 
 export default function App() {
   const { theme, toggle } = useTheme();
-  const { page, anchor } = useHashRoute();
+  const { page, anchor, query } = useHashRoute();
   const isLegal = page in legalDocs;
-  const activeId = useActiveSection(navIds, !isLegal);
+  const isDashboard = page === "dashboard";
+  const isAuth = ["login", "register", "forgot-password", "verify-email", "password-reset", "auth/callback"].includes(page);
+  const activeId = useActiveSection(navIds, !isLegal && !isAuth && !isDashboard);
 
   // Scroll handling: in-page anchors work natively on the home page; this covers
   // arriving from a legal page (target not yet rendered) and opening a legal page.
   useEffect(() => {
-    if (isLegal || !anchor) { window.scrollTo({ top: 0, behavior: "instant" }); return; }
+    if (isLegal || isDashboard || !anchor) { window.scrollTo({ top: 0, behavior: "instant" }); return; }
     document.getElementById(anchor)?.scrollIntoView({ behavior: "instant" });
-  }, [page, isLegal]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, isLegal, isDashboard]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -47,7 +52,11 @@ export default function App() {
       </a>
       <Header theme={theme} onToggleTheme={toggle} activeId={isLegal ? null : activeId} />
       <main id="main" tabIndex={-1}>
-        {isLegal ? (
+        {isDashboard ? (
+          <Dashboard />
+        ) : isAuth ? (
+          <AuthPage page={page} query={query} />
+        ) : isLegal ? (
           <DocumentPage doc={legalDocs[page]} slug={page} />
         ) : (
           <>
@@ -56,6 +65,7 @@ export default function App() {
             <Stats />
             <About />
             <MissionVision />
+            <Courses />
             <Projects />
             <Contact />
           </>

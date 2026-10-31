@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 //   anything else (#home, #about, ...)    -> the single-page home with in-page anchors
 const parse = () => {
   const h = window.location.hash;
-  return h.startsWith("#/") ? { page: h.slice(2), anchor: "" } : { page: "home", anchor: h.slice(1) };
+  if (!h.startsWith("#/")) return { page: "home", anchor: h.slice(1), query: new URLSearchParams() };
+  const [page, search = ""] = h.slice(2).split("?");
+  return { page, anchor: "", query: new URLSearchParams(search) };
 };
 
 export function useHashRoute() {
