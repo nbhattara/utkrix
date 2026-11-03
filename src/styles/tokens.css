@@ -1,0 +1,58 @@
+/* ==========================================================================
+   THEME TOKENS: the only place colours are defined.
+   Palette is derived from the UtkriX logo: navy ink, electric blue (the "X"),
+   and cyan (the arrow mark). To rebrand, change the --brand-* values below.
+   ========================================================================== */
+:root {
+  /* Brand palette (from logo) */
+  --brand-navy: #021a46;
+  --brand-blue: #0a63f0;
+  --brand-cyan: #12b0ff;
+
+  --font-display: "Sora", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --header-h: 72px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  color-scheme: light;
+}
+
+/* Light theme (default) */
+:root,
+:root[data-theme="light"] {
+  --bg: #f6f9fe;
+  --bg-tint: #eaf1fc;
+  --surface: #ffffff;
+  --text: #061a3f;
+  --muted: #46597c;
+  --border: #d4e0f3;
+  --accent: #0a56d6;        /* accent for text / links (contrast >= 4.5:1) */
+  --accent-fill: #0a63f0;   /* button background */
+  --accent-fill-hover: #0848b8;
+  --on-accent: #ffffff;
+  --glow: rgba(18, 176, 255, 0.22);
+  --shadow: 0 1px 2px rgba(6, 26, 63, 0.06), 0 8px 24px rgba(6, 26, 63, 0.06);
+  --logo-light-display: block;
+  --logo-dark-display: none;
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --bg: #030e24;
+  --bg-tint: #061832;
+  --surface: #081a3c;
+  --text: #eaf1ff;
+  --muted: #9db2d8;
+  --border: #17315f;
+  --accent: #5aa2ff;
+  --accent-fill: #1565e8;
+  --accent-fill-hover: #2f7bff;
+  --on-accent: #ffffff;
+  --glow: rgba(18, 176, 255, 0.28);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --logo-light-display: none;
+  --logo-dark-display: block;
+  color-scheme: dark;
+}
