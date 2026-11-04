@@ -9,7 +9,8 @@ Responsive marketing and learning-discovery website for UtkriX Technologies. It 
 - Student/instructor registration, email verification, password login/reset, and Google/Facebook/GitHub OAuth entry points are available through the backend.
 - The contact form validates fields in the browser and submits them to the backend contact API, which delivers them through configured SMTP. Contact messages are emailed, not stored by this frontend.
 - Several service, company, team, and statistics entries are explicitly placeholders. Replace them with verified company content before launch.
-- The website does not include an administrator CMS or course enrollment/payment pages. Projects are managed through admin-only backend endpoints.
+- Signed-in users have role-based dashboards for administrators, moderators, instructors, and students. The admin workspace manages selected site content, accounts, and inboxes; company, services, and legal-page content remain bundled static data.
+- Students can join instructor-led classrooms with a class code, complete structured lessons, submit assignments, and view grades and feedback. Paid enrollment and payment are not implemented.
 
 ## Technology
 
@@ -56,6 +57,53 @@ Header navigation targets `#home`, `#about`, `#courses`, `#projects`, and `#cont
 - `#/terms-of-service`
 
 Legal content is bundled in the source; these routes do not retrieve documents from a server.
+
+### Dashboards
+
+After signing in, use **Dashboard** in the header (`#/dashboard`). The available sections depend on the account role:
+
+| Role | Available now |
+|---|---|
+| **Administrator** | Live account/course/project overview; manage accounts, roles, instructor access and account status; manage courses, projects, FAQs, team members, and website statistics; reply to support chats, review contact-form messages, and view notifications. |
+| **Moderator** | Work with the support inbox, review contact-form messages, and view notifications. Moderators do not have account or course-management access. |
+| **Instructor** | Manage only courses assigned to their account; create and edit courses; build modules and lessons with video/document resources; view enrolled students; share instructor-only classroom posts and assignments; review submissions, grade work, leave feedback, and view notifications. Free-tier instructors can create up to two courses. |
+| **Student** | Browse the public catalog, join a classroom with its instructor-provided class code, study its structured lessons, track completion, submit assignment responses, view grades and feedback, and receive course notifications. Student access is limited to joined classes. |
+
+Classroom posts are read-only for students and the stream refreshes periodically; it is not a real-time group chat. Classroom uploads are private, limited to 25 MB, and available only to the assigned instructor, an administrator, or an enrolled student. A course completion certificate is issued after all lessons are completed and every course assignment has been graded. Certificates are currently shown in the student learning workspace; there is no separate certificate download or verification page.
+
+The instructor and student workspaces use the same responsive dashboard navigation and shared card/form styles. Student learning views show completion progress and feedback; the instructor workspace groups curriculum and grading tools by course.
+
+#### Recommended dashboard roadmap (not implemented)
+
+The following are proposed improvements, not features currently available in the dashboards.
+
+**Role-specific workspaces**
+
+- **Administrator:** add classroom and enrollment oversight, assignment administration, reports, and settings. Expand the overview with enrollment, classroom activity, pending instructor approval, and course engagement metrics.
+- **Instructor:** add course-level analytics and tools for organizing resources across larger curricula.
+- **Student:** add a resume-last-lesson shortcut, due-date reminders, and downloadable or verifiable certificates.
+- **Moderator:** add a focused support overview, reported-content and user-report queues, and activity history. Keep account roles and financial settings administrator-only.
+
+The core learning path is now supported: instructors build course modules and lessons, students enroll by class code and track lesson completion, assignment responses can be submitted and graded with feedback, and a certificate is issued when course requirements are met. A possible data hierarchy is `Course → Modules → Lessons and Assignments → Submissions → Grades and Feedback`, with enrollments linked to student progress.
+
+**Further business and platform improvements**
+
+- Add quizzes, automated grading, attendance, and course discussions.
+- Add reporting for enrollments, course engagement, and instructor performance; consider revenue reporting only after payments exist.
+- Add coupons, payment handling, and instructor earnings only with the required financial controls.
+- Add a content-management editor for currently bundled company, services, mission, and legal content. Team, statistics, projects, and FAQs already have admin management.
+- Add searchable/filterable reporting tables, richer trend charts, and accessible loading/empty states throughout the dashboards.
+- Add audit history for sensitive administrative actions.
+
+**Potential API groups**
+
+These are illustrative future interfaces; they are not currently implemented API routes:
+
+| Area | Example endpoints |
+|---|---|
+| Analytics | `GET /api/v1/analytics/admin` |
+
+Modules, lessons, progress, assignment submissions, grading, and certificate issuance are implemented under the authenticated `/api/v1/classrooms/{courseId}` routes. The notification center is available at `/api/v1/notifications`; it records new class content, assignments, and grading updates for enrolled students. Due-date reminders and the proposed analytics API are not implemented. Any additions must enforce authorization in the backend: students may access only their enrollments and submissions, instructors only their assigned courses, and moderators only their explicitly granted support/moderation scope. Validate uploads, authorize private-file access, and record sensitive administrative actions.
 
 ### Implemented interactions
 
