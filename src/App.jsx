@@ -17,7 +17,24 @@ import Projects from "./sections/Projects.jsx";
 import Courses from "./sections/Courses.jsx";
 import Contact from "./sections/Contact.jsx";
 import AuthPage from "./components/AuthPage.jsx";
-import Dashboard from "./components/Dashboard.jsx";
+
+const LOGIN_URL = (import.meta.env.VITE_LOGIN_URL || "http://login.lvh.me:5173").replace(/\/+$/, "");
+const EMPLOYEES_URL = (import.meta.env.VITE_EMPLOYEES_URL || "http://employees.lvh.me:5173").replace(/\/+$/, "");
+
+const AUTH_ROUTE_MAP = {
+  login: "/login",
+  register: "/register",
+  "forgot-password": "/forgot-password",
+  "verify-email": "/verify-email",
+  "password-reset": "/reset-password",
+};
+
+function ExternalRedirect({ to }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+  return null;
+}
 
 // Legal pages: route (hash) -> document. Add more here if needed.
 const legalDocs = {
@@ -31,7 +48,12 @@ export default function App() {
   const { page, anchor, query } = useHashRoute();
   const isLegal = page in legalDocs;
   const isDashboard = page === "dashboard";
-  const isAuth = ["login", "register", "forgot-password", "verify-email", "password-reset", "auth/callback"].includes(page);
+  const isAuthCallback = page === "auth/callback";
+  const isAuthRedirect = page in AUTH_ROUTE_MAP;
+  const isAuth = isAuthRedirect || isAuthCallback;
+  const authRedirectTo = isAuthRedirect
+    ? `${LOGIN_URL}${AUTH_ROUTE_MAP[page]}${window.location.hash.includes("?") ? window.location.hash.slice(window.location.hash.indexOf("?")) : ""}`
+    : null;
   const activeId = useActiveSection(navIds, !isLegal && !isAuth && !isDashboard);
 
   // Scroll handling: in-page anchors work natively on the home page; this covers
@@ -53,8 +75,10 @@ export default function App() {
       <Header theme={theme} onToggleTheme={toggle} activeId={isLegal ? null : activeId} />
       <main id="main" tabIndex={-1}>
         {isDashboard ? (
-          <Dashboard />
-        ) : isAuth ? (
+          <ExternalRedirect to={EMPLOYEES_URL} />
+        ) : isAuthRedirect ? (
+          <ExternalRedirect to={authRedirectTo} />
+        ) : isAuthCallback ? (
           <AuthPage page={page} query={query} />
         ) : isLegal ? (
           <DocumentPage doc={legalDocs[page]} slug={page} />

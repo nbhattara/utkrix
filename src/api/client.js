@@ -1,16 +1,27 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/+$/, "");
 
+function getCsrfToken() {
+  const match = document.cookie.match(/(^|;)\s*csrf_token\s*=\s*([^;]+)/);
+  return match ? match[2] : null;
+}
+
 async function requestApi(path, options = {}) {
   const headers = new Headers(options.headers || {});
   const token = sessionStorage.getItem("utkrix-auth-token");
   if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const method = (options.method || "GET").toUpperCase();
+  const csrfToken = getCsrfToken();
+  if (csrfToken && ["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    headers.set("X-CSRF-Token", csrfToken);
+  }
 
   if (options.body && !(options.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
     options.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers, credentials: "include" });
   let payload;
 
   try {

@@ -7,6 +7,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
+      // Main site is reached through scripts/dev-gateway.js on :5173;
+      // this is its direct backend port.
+      port: Number(env.VITE_DEV_PORT) || 5177,
+      strictPort: true,
+      allowedHosts: ['.localhost', '.lvh.me', '.nip.io'],
       proxy: {
         "/api": {
           target: env.API_PROXY_TARGET || "http://localhost:5000",
