@@ -43,8 +43,8 @@ async function requestApi(path, options = {}) {
   return { payload, response };
 }
 
-export async function postApi(path, body) {
-  const { payload } = await requestApi(path, { method: "POST", body });
+export async function postApi(path, body, options = {}) {
+  const { payload } = await requestApi(path, { ...options, method: "POST", body });
   return payload;
 }
 
@@ -58,8 +58,8 @@ export async function deleteApi(path) {
   return payload;
 }
 
-export async function getApi(path) {
-  const { payload } = await requestApi(path);
+export async function getApi(path, options = {}) {
+  const { payload } = await requestApi(path, options);
   return payload;
 }
 

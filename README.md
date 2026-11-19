@@ -1,7 +1,164 @@
-# UtkriX Technologies Website
+# Project Overview
 
-Responsive marketing and learning-discovery website for UtkriX Technologies. It is a React single-page application built with Vite. Published courses and projects are loaded from the e-learning backend; registration and sign-in use its account APIs and OAuth providers.
+This repository contains the UtkriX Technologies platform: a public marketing website (repo root), a dedicated authentication app (login-frontend/), an employee/student portal (utkrix-tech/), and a shared Node.js/Express + Prisma/MySQL backend (elearning-master-backend/). File storage uses Cloudflare R2 (S3-compatible) with a local-disk fallback for development. Production frontends deploy to Vercel; the backend deploys as a Vercel serverless function (api/index.js) or any Node host.
 
+## Folder Structure
+
+```
+.
+├── AUTH_DEPLOYMENT.md
+├── index.html
+├── package.json
+├── playwright.config.js
+├── README.md
+├── vercel.json
+├── vite.config.js
+├── elearning-master-backend/
+│   ├── add_approval_fields.sql
+│   ├── openapi.json
+│   ├── package.json
+│   ├── SCHEMA_UPDATE_20261010.sql
+│   ├── server.js
+│   ├── skills-lock.json
+│   ├── config/
+│   ├── controllers/
+│   ├── logs/
+│   ├── middleware/
+│   ├── prisma/
+│   ├── private-uploads/
+│   ├── routes/
+│   ├── scripts/
+│   ├── services/
+│   ├── tests/
+│   ├── tmp/
+│   ├── uploads/
+│   └── utils/
+├── login-frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── public/
+│   └── src/
+├── public/
+│   └── assets/
+├── scripts/
+│   ├── dev-gateway.js
+│   ├── extract_legal.py
+│   ├── privacy_policy.txt
+│   └── terms_of_service.txt
+├── src/
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── api/
+│   ├── auth/
+│   ├── components/
+│   ├── config/
+│   ├── data/
+│   ├── hooks/
+│   ├── sections/
+│   ├── styles/
+│   └── tests/
+├── tests/
+│   ├── accessibility.spec.js
+│   ├── auth.spec.js
+│   ├── homepage.spec.js
+│   └── login-frontend.spec.js
+└── utkrix-tech/
+    ├── index.html
+    ├── package.json
+    ├── README.md
+    ├── vite.config.js
+    ├── public/
+    ├── scripts/
+    └── src/
+```
+
+## How to Run
+
+### 1. elearning-master-backend
+
+This is the backend service for the elearning platform.
+
+**Navigate to the backend directory:**
+```bash
+cd elearning-master-backend
+```
+
+**Install dependencies:**
+```bash
+npm install
+```
+
+**Available scripts:**
+- `npm run dev`: Starts the development server with `nodemon` for automatic restarts.
+- `npm start`: Starts the production server.
+- `npm test`: Runs the tests.
+- `npm run admin:provision`: Provisions an admin user.
+- `npm run smoke:api`: Runs API smoke tests.
+- `npm run swagger`: Generates OpenAPI documentation.
+
+To start the development server, run:
+```bash
+npm run dev
+```
+
+### 2. utkrix-tech
+
+This is the frontend website for Utkrix Technologies.
+
+**Navigate to the frontend directory:**
+```bash
+cd utkrix-tech
+```
+
+**Install dependencies:**
+```bash
+npm install
+```
+
+**Available scripts:**
+- `npm run dev`: Starts the development server using Vite.
+- `npm run build`: Builds the project for production.
+- `npm run preview`: Serves the production build locally.
+
+To start the development server, run:
+```bash
+npm run dev
+```
+
+### 3. Root website (marketing site)
+
+**Navigate to the repository root:**
+```bash
+npm install
+npm run dev
+```
+
+### 4. login-frontend (authentication app)
+
+**Navigate to the login app directory:**
+```bash
+cd login-frontend
+npm install
+npm run dev
+```
+
+### Local multi-app development
+
+All three frontends can run behind subdomain-style URLs via the dev gateway:
+
+```bash
+node scripts/dev-gateway.js   # serves :5173 and routes by hostname
+```
+
+- `abc.localhost:5173` / `localhost:5173` — main marketing site
+- `login.localhost:5173` / `login.lvh.me:5173` — login & registration app
+- `employees.localhost:5173` / `employees.lvh.me:5173` — employee/student portal
+- `admin.localhost:5173` — admin portal (currently same app as employees)
+
+Note: `*.localhost` resolves to 127.0.0.1 automatically but browsers reject shared `Domain=localhost` cookies. Use `*.lvh.me` subdomains for full cross-app single sign-on in local development.
+
+Authentication is centralized: users sign in on the login app, which sets HttpOnly refresh-token cookies scoped to the shared cookie domain; portal apps restore sessions via `POST /api/v1/auth/refresh`. See `AUTH_DEPLOYMENT.md` for production DNS, Vercel, CORS, and cookie configuration.
 ## Current status
 
 - The home page presents company information, services, stats, mission/vision/goals, backend-published courses and projects, and contact details.
@@ -190,6 +347,20 @@ Request (phone is optional):
 The API returns `{ "success": true, "message": "..." }` after SMTP delivery, or a non-2xx `{ "success": false, "message": "..." }` response for validation, rate-limit, or delivery failures. The endpoint does not persist messages, so delivery depends on backend SMTP configuration.
 
 
+## File storage (Cloudflare R2)
+
+Uploads are stored via `elearning-master-backend/services/storage/r2StorageService.js` (AWS SDK S3 client pointed at the R2 endpoint):
+
+- `R2_PUBLIC_BUCKET` — course thumbnails and other public assets (served via `R2_PUBLIC_URL`).
+- `R2_PRIVATE_BUCKET` — classroom attachments, lesson files, and assignment materials. Downloads go through authenticated endpoints that return short-lived (5-minute) presigned URLs after the existing enrollment/role checks.
+- If `R2_ACCOUNT_ID`/`R2_ACCESS_KEY_ID`/`R2_SECRET_ACCESS_KEY` are not set, the service falls back to local disk (`uploads/` and `private-uploads/`) for development.
+- Legacy database `attachmentKey` values without a `/` prefix are treated as local files; new R2 keys are stored with their bucket prefix.
+
+## Deployment
+
+- Frontends: Vercel projects for the root app, `login-frontend/`, and `utkrix-tech/`. Set `VITE_API_BASE_URL`/`VITE_API_URL` to the deployed backend `/api/v1` URL and the `VITE_*_URL` app URLs before building.
+- Backend: deploy `elearning-master-backend/` as its own Vercel project (`api/index.js` exports the Express app; `vercel.json` routes all paths to it). Required env: `NODE_ENV=production`, `MYSQL_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `CORS_ORIGINS`, cookie settings, SMTP, OAuth secrets, and `R2_*` values.
+- Note: Vercel Functions cap request bodies (~4.5 MB), so large classroom/video uploads need the presigned direct-to-R2 flow (see AUTH_DEPLOYMENT.md / pending work).
 ## Requirements
 
 ### Functional requirements

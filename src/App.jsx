@@ -17,6 +17,7 @@ import Projects from "./sections/Projects.jsx";
 import Courses from "./sections/Courses.jsx";
 import Contact from "./sections/Contact.jsx";
 import AuthPage from "./components/AuthPage.jsx";
+import SupportMessenger from "./components/SupportMessenger.jsx";
 
 const LOGIN_URL = (import.meta.env.VITE_LOGIN_URL || "http://login.lvh.me:5173").replace(/\/+$/, "");
 const EMPLOYEES_URL = (import.meta.env.VITE_EMPLOYEES_URL || "http://employees.lvh.me:5173").replace(/\/+$/, "");
@@ -96,6 +97,7 @@ export default function App() {
         )}
       </main>
       <Footer />
+      {!isLegal && !isDashboard && !isAuth && <SupportMessenger />}
     </>
   );
 }
