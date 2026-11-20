@@ -53,8 +53,8 @@ function LoginPage() {
     <AuthLayout title="Welcome back" description="Sign in to continue with UtkriX Technologies">
       <AuthMessage error={error} success={success} />
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="auth-field">
+          <label htmlFor="email" className="auth-label">
             Email address
           </label>
           <input
@@ -66,7 +66,7 @@ function LoginPage() {
             required
             autoComplete="email"
             maxLength={254}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="auth-input"
           />
         </div>
 
@@ -79,15 +79,15 @@ function LoginPage() {
           autoComplete="current-password"
         />
 
-        <div className="flex items-center justify-between mb-4">
-          <label className="flex items-center">
+        <div className="auth-row">
+          <label className="auth-remember">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              className="auth-checkbox"
             />
-            <span className="ml-2 text-sm text-gray-600">Remember me</span>
+            <span className="auth-remember-label">Remember me</span>
           </label>
           <AuthLink to="/forgot-password">Forgot password?</AuthLink>
         </div>
@@ -95,7 +95,7 @@ function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="auth-btn"
         >
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
@@ -105,14 +105,14 @@ function LoginPage() {
             type="button"
             onClick={handleResendVerification}
             disabled={loading || !email}
-            className="w-full mt-3 text-sm text-indigo-600 hover:text-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="auth-btn auth-btn--ghost"
           >
             Resend verification email
           </button>
         )}
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-600">
+      <p className="auth-switch">
         New to UtkriX? <AuthLink to="/register">Create an account</AuthLink>
       </p>
     </AuthLayout>
