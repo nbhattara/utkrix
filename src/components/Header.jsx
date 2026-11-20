@@ -40,7 +40,7 @@ export default function Header({ theme, onToggleTheme, activeId }) {
             ))}
             {user ? (
               <li className="nav__account">
-                <a className="nav__user nav__dashboard-link" href={EMPLOYEES_URL} title={user.email} onClick={() => setOpen(false)}>
+                <a className="nav__user nav__dashboard-link" href={`${EMPLOYEES_URL}/#/dashboard`} title={user.email} onClick={() => setOpen(false)}>
                   Dashboard
                 </a>
                 <button
