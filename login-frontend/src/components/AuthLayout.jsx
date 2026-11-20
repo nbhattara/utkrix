@@ -5,6 +5,7 @@ function AuthLayout({ title, description, children }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
+          <img src="/logo.png" alt="UtkriX Technologies" className="h-12 mx-auto mb-3" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">UTKRIX TECHNOLOGIES</h1>
           <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
           <p className="text-gray-600 mt-2">{description}</p>
