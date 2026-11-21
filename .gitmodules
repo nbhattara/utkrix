@@ -1,0 +1,3 @@
+[submodule "elearning-master-backend"]
+	path = elearning-master-backend
+	url = https://github.com/Chetan-Chamlagai/elearning-master-backend.git
