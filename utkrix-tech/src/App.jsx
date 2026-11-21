@@ -18,6 +18,7 @@ import Courses from "./sections/Courses.jsx";
 import Contact from "./sections/Contact.jsx";
 import AuthPage from "./components/AuthPage.jsx";
 import Dashboard from "./components/Dashboard.jsx";
+import { useAuth } from "./auth/AuthContext.jsx";
 
 const LOGIN_URL = (import.meta.env.VITE_LOGIN_URL || "http://login.lvh.me:5173").replace(/\/+$/, "");
 const EMPLOYEES_URL = (import.meta.env.VITE_EMPLOYEES_URL || "http://employees.lvh.me:5173").replace(/\/+$/, "");
@@ -47,6 +48,7 @@ const navIds = navItems.map((n) => n.id);
 export default function App() {
   const { theme, toggle } = useTheme();
   const { page, anchor, query } = useHashRoute();
+  const { ready: authReady } = useAuth();
   const isLegal = page in legalDocs;
   const isDashboard = page === "dashboard";
   const isAuthCallback = page === "auth/callback";
