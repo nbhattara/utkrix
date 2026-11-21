@@ -123,3 +123,54 @@ export function getMediaUrl(path) {
     : window.location.origin;
   return new URL(path, `${apiOrigin}/`).toString();
 }
+
+const PRESIGN_THRESHOLD = 4 * 1024 * 1024;
+
+export async function prepareFormDataForUpload(formData) {
+  const entries = [...formData.entries()];
+  for (const [name, value] of entries) {
+    if (!(value instanceof File) || value.size <= PRESIGN_THRESHOLD) continue;
+    const category = /video/i.test(value.type) ? 'video' : 'classroom';
+    const presign = await postApi('/uploads/presign', {
+      category,
+      filename: value.name,
+      contentType: value.type || 'application/octet-stream',
+      sizeBytes: value.size,
+    });
+    const put = await fetch(presign.uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': value.type || 'application/octet-stream' },
+      body: value,
+    });
+    if (!put.ok) throw new Error('Direct upload to storage failed.');
+    await postApi('/uploads/complete', { key: presign.key, category, filename: value.name, contentType: value.type });
+    formData.delete(name);
+    formData.set('attachmentKey', presign.key);
+    formData.set('originalFileName', value.name);
+  }
+  return formData;
+}
+
+export async function getApiFile(path) {
+  const headers = new Headers();
+  const token = sessionStorage.getItem("utkrix-auth-token");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const response = await fetch(`${API_BASE_URL}${path}`, { headers, credentials: "include" });
+  if (response.status === 401) {
+    window.dispatchEvent(new CustomEvent("utkrix:unauthorized"));
+  }
+  if (!response.ok) {
+    let message = `Request failed with status ${response.status}`;
+    try {
+      const payload = await response.json();
+      message = payload?.message || message;
+    } catch {
+      message = response.statusText || message;
+    }
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
+  }
+  return response.blob();
+}
