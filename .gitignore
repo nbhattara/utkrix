@@ -11,3 +11,24 @@ private-uploads/
 .env.*
 !.env.example
 !.env.production
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+
+# Private uploads
+private-uploads/
