@@ -5,8 +5,6 @@ import ThemeToggle from "./ThemeToggle.jsx";
 import Icon from "./Icon.jsx";
 import { useAuth } from "../auth/AuthContext.jsx";
 
-const EMPLOYEES_URL = (import.meta.env.VITE_EMPLOYEES_URL || "http://employees.lvh.me:5173").replace(/\/+$/, "");
-
 export default function Header({ theme, onToggleTheme, activeId }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
@@ -40,7 +38,7 @@ export default function Header({ theme, onToggleTheme, activeId }) {
             ))}
             {user ? (
               <li className="nav__account">
-                <a className="nav__user nav__dashboard-link" href={`${EMPLOYEES_URL}/#/dashboard`} title={user.email} onClick={() => setOpen(false)}>
+                <a className="nav__user nav__dashboard-link" href="#/dashboard" title={user.email} onClick={() => setOpen(false)}>
                   Dashboard
                 </a>
                 <button
