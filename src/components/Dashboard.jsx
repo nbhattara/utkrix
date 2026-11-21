@@ -512,12 +512,12 @@ function StudentDashboard() {
         : error ? <p className="collection-status collection-status--error" role="alert">{error}</p>
           : data && (
             <MetricCards metrics={[
-              { label: "Enrolled courses", value: data.enrollments.total },
-              { label: "In progress", value: data.enrollments.active },
-              { label: "Completed", value: data.enrollments.completed },
-              { label: "Average progress", value: `${data.enrollments.avgProgress}%` },
-              { label: "Certificates", value: data.certificates.total },
-              { label: "Pending payments", value: data.payments.pending },
+              { label: "Enrolled courses", value: data.enrollments?.total },
+              { label: "In progress", value: data.enrollments?.active },
+              { label: "Completed", value: data.enrollments?.completed },
+              { label: "Average progress", value: data.enrollments?.avgProgress != null ? `${data.enrollments.avgProgress}%` : null },
+              { label: "Certificates", value: data.certificates?.total },
+              { label: "Pending payments", value: data.payments?.pending },
             ]} />
           )}
 
@@ -532,7 +532,7 @@ function StudentDashboard() {
               <thead><tr><th>Course</th><th>Status</th><th>Progress</th><th>Action</th></tr></thead>
               <tbody>{data.recentCourses.map((enrollment) => (
                 <tr key={enrollment.id}>
-                  <td><strong>{enrollment.course.title}</strong><span>{enrollment.course.category}</span></td>
+                  <td><strong>{enrollment.course?.title}</strong><span>{enrollment.course?.category}</span></td>
                   <td><span className="dashboard-badge">{enrollment.status}</span></td>
                   <td>{Math.round(Number(enrollment.completionPercentage))}%</td>
                   <td><a href="#courses">Explore courses</a></td>
@@ -564,12 +564,12 @@ function InstructorDashboard({ onNotice }) {
       {loading ? <p className="collection-status" role="status">Loading instructor overview…</p>
         : error ? <p className="collection-status collection-status--error" role="alert">{error}</p>
           : data && <MetricCards metrics={[
-            { label: "Your courses", value: data.courses.total },
-            { label: "Published", value: data.courses.published },
-            { label: "Drafts", value: data.courses.draft },
-            { label: "Students", value: data.enrollments.total },
-            { label: "Active enrollments", value: data.enrollments.active },
-            { label: "Quizzes", value: data.quizzes.total },
+            { label: "Your courses", value: data.courses?.total },
+            { label: "Published", value: data.courses?.published },
+            { label: "Drafts", value: data.courses?.draft },
+            { label: "Students", value: data.enrollments?.total },
+            { label: "Active enrollments", value: data.enrollments?.active },
+            { label: "Quizzes", value: data.quizzes?.total },
           ]} />}
       <CourseManager onNotice={onNotice} onDataChange={() => setRevision((value) => value + 1)} />
     </>
@@ -593,14 +593,14 @@ function AdminDashboard({ user, onNotice }) {
       {loading ? <p className="collection-status" role="status">Loading administrator overview…</p>
         : error ? <p className="collection-status collection-status--error" role="alert">{error}</p>
           : dashboard && <MetricCards metrics={[
-            { label: "Total accounts", value: dashboard.users.total },
-            { label: "Instructors", value: dashboard.users.teachers },
-            { label: "Pending instructors", value: dashboard.users.pendingTeachers },
-            { label: "Courses", value: dashboard.courses.total },
-            { label: "Published courses", value: dashboard.courses.published },
-            { label: "Enrollments", value: dashboard.courses.enrollments },
-            { label: "Pending payments", value: dashboard.payments.pending },
-            { label: "Certificates", value: dashboard.certificates.issued },
+            { label: "Total accounts", value: dashboard.users?.total },
+            { label: "Instructors", value: dashboard.users?.teachers },
+            { label: "Pending instructors", value: dashboard.users?.pendingTeachers },
+            { label: "Courses", value: dashboard.courses?.total },
+            { label: "Published courses", value: dashboard.courses?.published },
+            { label: "Enrollments", value: dashboard.courses?.enrollments },
+            { label: "Pending payments", value: dashboard.payments?.pending },
+            { label: "Certificates", value: dashboard.certificates?.issued },
           ]} />}
       <AdminUsers currentUserId={user.id} onNotice={onNotice} />
       <CourseManager onNotice={onNotice} />

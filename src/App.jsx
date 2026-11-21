@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Component, useEffect } from "react";
 import { navItems } from "./config/site.js";
 import { useTheme } from "./hooks/useTheme.js";
 import { useHashRoute } from "./hooks/useHashRoute.js";
@@ -36,6 +36,33 @@ const legalDocs = {
   "privacy-policy": privacyPolicy,
   "terms-of-service": termsOfService,
 };
+class DashboardErrorBoundary extends Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error("Dashboard failed to render", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <section className="auth-section">
+          <div className="auth-card">
+            <div className="auth-card__intro"><span className="auth-eyebrow">UTKRIX LEARNING</span><h1>Something went wrong</h1></div>
+            <p className="auth-message auth-message--error" role="alert">The dashboard could not be displayed. Please reload the page or sign in again.</p>
+            <button className="btn btn--primary auth-form__submit" type="button" onClick={() => window.location.reload()}>Reload</button>
+          </div>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const navIds = navItems.map((n) => n.id);
 
 export default function App() {
@@ -80,7 +107,7 @@ export default function App() {
       <Header theme={theme} onToggleTheme={toggle} activeId={isLegal ? null : activeId} />
       <main id="main" tabIndex={-1}>
         {isDashboard ? (
-          authReady ? <Dashboard /> : <p className="collection-status" role="status">Loading your workspace…</p>
+          authReady ? <DashboardErrorBoundary><Dashboard /></DashboardErrorBoundary> : <p className="collection-status" role="status">Loading your workspace…</p>
         ) : isAuthRedirect || isAuthCallback ? (
           <AuthPage page={page} query={query} />
         ) : isLegal ? (
