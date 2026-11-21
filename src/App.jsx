@@ -47,6 +47,15 @@ const navIds = navItems.map((n) => n.id);
 export default function App() {
   const { theme, toggle } = useTheme();
   const { page, anchor, query } = useHashRoute();
+
+  // The login.* subdomain should open the sign-in page, not the landing page.
+  useEffect(() => {
+    if (window.location.hostname.startsWith("login.")
+      && window.location.pathname === "/"
+      && !window.location.hash.startsWith("#/")) {
+      window.location.replace("/login");
+    }
+  }, []);
   const isLegal = page in legalDocs;
   const isDashboard = page === "dashboard";
   const isAuthCallback = page === "auth/callback";
