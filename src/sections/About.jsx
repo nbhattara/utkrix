@@ -2,7 +2,6 @@ import { about } from "../data/about.js";
 import { team } from "../data/team.js";
 import { assets } from "../config/site.js";
 import SectionHeading from "../components/SectionHeading.jsx";
-import PlaceholderNote from "../components/PlaceholderNote.jsx";
 
 const initials = (name) => name.split(" ").map((w) => w[0]).slice(0, 2).join("");
 
@@ -11,7 +10,6 @@ export default function About() {
     <section id="about" className="section" aria-labelledby="about-title">
       <div className="container">
         <SectionHeading id="about-title" title="About UtkriX" />
-        <PlaceholderNote>Placeholder text. Replace with the real company story.</PlaceholderNote>
         <div className="about__grid">
           <div className="about__text">
             {about.paragraphs.map((p) => <p key={p}>{p}</p>)}
@@ -22,7 +20,6 @@ export default function About() {
         </div>
 
         <h3 className="subhead" id="team-title">Our team</h3>
-        <PlaceholderNote>Placeholder team members. Replace names, roles and add photos.</PlaceholderNote>
         <ul className="team" aria-labelledby="team-title">
           {team.map((m) => (
             <li key={m.name}>
