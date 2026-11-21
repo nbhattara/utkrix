@@ -78,7 +78,7 @@ export default function App() {
       <Header theme={theme} onToggleTheme={toggle} activeId={isLegal ? null : activeId} />
       <main id="main" tabIndex={-1}>
         {isDashboard ? (
-          <Dashboard />
+          authReady ? <Dashboard /> : <p className="collection-status" role="status">Loading your workspace…</p>
         ) : isAuthRedirect ? (
           <ExternalRedirect to={authRedirectTo} />
         ) : isAuthCallback ? (

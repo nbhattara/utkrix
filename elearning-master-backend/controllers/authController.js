@@ -18,7 +18,20 @@ const {
 } = require('../services/emailService');
 const { generateCSRFToken } = require('../middleware/csrfMiddleware');
 
-const setAuthCookies = (res, refreshToken) => {
+const csrfCookieOptions = () => ({
+  httpOnly: false,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.COOKIE_SAME_SITE || 'lax',
+  domain: process.env.COOKIE_DOMAIN || undefined,
+  path: '/',
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+});
+
+// The csrf_token cookie lives on the API host, which frontend apps on sibling
+// subdomains cannot read via document.cookie. Reuse an existing token so it
+// stays stable across refreshes, and return it so callers can send it back in
+// the X-CSRF-Token header.
+const setAuthCookies = (res, refreshToken, existingCsrfToken) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const cookieDomain = process.env.COOKIE_DOMAIN || undefined;
   const cookieSecure = isProduction ? true : false;
@@ -33,14 +46,10 @@ const setAuthCookies = (res, refreshToken) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
-  res.cookie('csrf_token', generateCSRFToken(), {
-    httpOnly: false,
-    secure: cookieSecure,
-    sameSite: cookieSameSite,
-    domain: cookieDomain,
-    path: '/',
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  });
+  const csrfToken = existingCsrfToken || generateCSRFToken();
+  res.cookie('csrf_token', csrfToken, csrfCookieOptions());
+
+  return csrfToken;
 };
 
 const controller = {};
@@ -162,12 +171,13 @@ controller.login = async (req, res) => {
       req.ip
     );
 
-    setAuthCookies(res, refreshToken);
+    const csrfToken = setAuthCookies(res, refreshToken, req.cookies?.csrf_token);
 
     res.json({
       success: true,
       message: 'Login successful',
       accessToken,
+      csrfToken,
       user: {
         id: user.id,
         name: user.name,
@@ -281,11 +291,12 @@ controller.refresh = async (req, res) => {
 
     const result = await rotateRefreshToken(prisma, hashToken(refreshToken), userAgent, ipAddress);
 
-    setAuthCookies(res, result.refreshToken);
+    const csrfToken = setAuthCookies(res, result.refreshToken, req.cookies?.csrf_token);
 
     res.json({
       success: true,
       accessToken: result.accessToken,
+      csrfToken,
       user: result.user,
     });
   } catch (error) {
@@ -328,6 +339,17 @@ controller.logout = async (req, res) => {
   } catch (error) {
     return respondWithError(res, error, 'Logout');
   }
+};
+
+controller.getCsrfToken = (req, res) => {
+  const existing = req.cookies?.csrf_token;
+  if (existing) {
+    return res.json({ success: true, csrfToken: existing });
+  }
+
+  const csrfToken = generateCSRFToken();
+  res.cookie('csrf_token', csrfToken, csrfCookieOptions());
+  return res.json({ success: true, csrfToken });
 };
 
 controller.me = async (req, res) => {

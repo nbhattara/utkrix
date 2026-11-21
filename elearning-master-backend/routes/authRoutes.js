@@ -81,6 +81,23 @@ router.post(
 
 /**
  * @swagger
+ * /api/v1/auth/csrf-token:
+ *   get:
+ *     summary: Get the CSRF token for cross-origin clients
+ *     description: >-
+ *       Returns the csrf_token cookie value so frontends hosted on sibling
+ *       subdomains (which cannot read the API host's cookies via
+ *       document.cookie) can send it back in the X-CSRF-Token header.
+ *     tags: [Authentication]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Current CSRF token; cookie is set if missing
+ */
+router.get('/csrf-token', authController.getCsrfToken);
+
+/**
+ * @swagger
  * /api/v1/auth/register:
  *   post:
  *     summary: Register a student account

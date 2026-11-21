@@ -449,7 +449,8 @@ controller.exchange = async (req, res) => {
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    res.cookie('csrf_token', generateCSRFToken(), {
+    const csrfToken = req.cookies?.csrf_token || generateCSRFToken();
+    res.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: cookieSecure,
       sameSite: cookieSameSite,
@@ -462,6 +463,7 @@ controller.exchange = async (req, res) => {
       success: true,
       message: 'Sign-in successful',
       token: issueAccessToken(user),
+      csrfToken,
       user: {
         id: user.id,
         name: user.name,

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { postApi } from "../api/client.js";
+import { postApi, setCsrfToken, clearCsrfToken } from "../api/client.js";
 
 const SESSION_KEY = "utkrix-auth-session";
 const TOKEN_KEY = "utkrix-auth-token";
@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem("utkrix-refresh-attempt");
     setSession(null);
-    postApi("/auth/logout", {}).catch(() => {});
+    postApi("/auth/logout", {}).catch(() => {}).finally(() => clearCsrfToken());
   }, []);
 
   useEffect(() => {
@@ -47,6 +47,7 @@ export function AuthProvider({ children }) {
     postApi("/auth/refresh", {})
       .then((result) => {
         if (result?.accessToken && result?.user) {
+          if (result.csrfToken) setCsrfToken(result.csrfToken);
           const nextSession = { token: result.accessToken, user: result.user };
           sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
           sessionStorage.setItem(TOKEN_KEY, result.accessToken);
@@ -61,7 +62,8 @@ export function AuthProvider({ children }) {
     ready,
     user: session?.user || null,
     token: session?.token || null,
-    signIn: ({ token, accessToken, user }) => {
+    signIn: ({ token, accessToken, user, csrfToken }) => {
+      if (csrfToken) setCsrfToken(csrfToken);
       const resolvedToken = token || accessToken;
       const nextSession = { token: resolvedToken, user };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));

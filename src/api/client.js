@@ -1,8 +1,42 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/+$/, "");
 
-function getCsrfToken() {
+let cachedCsrfToken = null;
+let csrfTokenRequest = null;
+
+export function setCsrfToken(token) {
+  cachedCsrfToken = token || null;
+}
+
+export function clearCsrfToken() {
+  cachedCsrfToken = null;
+  csrfTokenRequest = null;
+}
+
+async function fetchCsrfToken() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/csrf-token`, { credentials: "include" });
+    const payload = await response.json().catch(() => null);
+    if (response.ok && payload?.csrfToken) {
+      cachedCsrfToken = payload.csrfToken;
+      return cachedCsrfToken;
+    }
+  } catch {
+    // Fall through and let the request proceed without a token.
+  }
+  return null;
+}
+
+// The csrf_token cookie lives on the API host. Same-origin apps can read it
+// from document.cookie; cross-origin apps (api.* vs app.*) fetch it from the
+// dedicated endpoint instead and cache it for the page lifetime.
+async function getCsrfToken() {
   const match = document.cookie.match(/(^|;)\s*csrf_token\s*=\s*([^;]+)/);
-  return match ? match[2] : null;
+  if (match) return match[2];
+  if (cachedCsrfToken) return cachedCsrfToken;
+  if (!csrfTokenRequest) {
+    csrfTokenRequest = fetchCsrfToken().finally(() => { csrfTokenRequest = null; });
+  }
+  return csrfTokenRequest;
 }
 
 async function requestApi(path, options = {}) {
@@ -11,8 +45,8 @@ async function requestApi(path, options = {}) {
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   const method = (options.method || "GET").toUpperCase();
-  const csrfToken = getCsrfToken();
-  if (csrfToken && ["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+  const csrfToken = ["POST", "PUT", "PATCH", "DELETE"].includes(method) ? await getCsrfToken() : null;
+  if (csrfToken) {
     headers.set("X-CSRF-Token", csrfToken);
   }
 
