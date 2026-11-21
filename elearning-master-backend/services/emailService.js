@@ -81,8 +81,7 @@ const renderEmail = ({ preview, title, intro, body, actionUrl, actionLabel }) =>
 const sendAccountEmail = async ({ to, subject, actionPath, token, actionName, expiresIn }) => {
   const transporter = getTransporter();
   const actionUrl = new URL(getFrontendUrl());
-  actionUrl.pathname = `/${actionPath}`;
-  actionUrl.search = `?token=${encodeURIComponent(token)}`;
+  actionUrl.hash = `/${actionPath}?token=${encodeURIComponent(token)}`;
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM,

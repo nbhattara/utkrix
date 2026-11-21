@@ -10,3 +10,4 @@ private-uploads/
 .env
 .env.*
 !.env.example
+!.env.production
