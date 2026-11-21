@@ -1,0 +1,21 @@
+-- Create refresh_tokens table
+CREATE TABLE `refresh_tokens` (
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `user_id` INTEGER NOT NULL,
+  `token_hash` CHAR(64) NOT NULL,
+  `user_agent` VARCHAR(500) NULL,
+  `ip_address` VARCHAR(45) NULL,
+  `expires_at` DATETIME(3) NOT NULL,
+  `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `replaced_by` INTEGER NULL,
+  UNIQUE INDEX `refresh_tokens_token_hash_key`(`token_hash`),
+  INDEX `refresh_tokens_user_id_idx`(`user_id`),
+  INDEX `refresh_tokens_expires_at_idx`(`expires_at`),
+  PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Add foreign key constraint
+ALTER TABLE `refresh_tokens`
+  ADD CONSTRAINT `refresh_tokens_user_id_fkey`
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+  ON DELETE CASCADE ON UPDATE CASCADE;
