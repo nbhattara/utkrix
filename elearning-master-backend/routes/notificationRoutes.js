@@ -1,7 +1,8 @@
 const express = require('express');
-const { param, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 const controller = require('../controllers/notificationController');
 const protect = require('../middleware/authMiddleware');
+const authorize = require('../middleware/roleMiddleware');
 const AppError = require('../utils/AppError');
 
 const router = express.Router();
@@ -39,6 +40,12 @@ router.get('/', controller.list);
  *       200:
  *         description: Notifications marked as read
  */
+router.post('/broadcast', authorize('admin'), [
+  body('title').trim().isLength({ min: 3, max: 150 }).withMessage('Title must be 3-150 characters'),
+  body('body').trim().isLength({ min: 1, max: 2000 }).withMessage('Message must be 1-2000 characters'),
+  body('imageUrl').optional({ nullable: true }).isURL().isLength({ max: 2048 }).withMessage('Image URL must be a valid URL'),
+], validate, controller.createBroadcast);
+
 router.post('/read-all', controller.markAllRead);
 
 /**

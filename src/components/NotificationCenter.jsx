@@ -30,6 +30,12 @@ export default function NotificationCenter({ onNotice }) {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  useEffect(() => {
+    const onChanged = () => setRevision((value) => value + 1);
+    window.addEventListener("utkrix:notifications-changed", onChanged);
+    return () => window.removeEventListener("utkrix:notifications-changed", onChanged);
+  }, []);
+
   const markRead = async (id) => {
     setSaving(true);
     try {
@@ -73,6 +79,7 @@ export default function NotificationCenter({ onNotice }) {
                   <div>
                     <span className="auth-eyebrow">{item.type}</span>
                     <h3>{item.title}</h3>
+                    {item.imageUrl ? <img className="notification-item__image" src={item.imageUrl} alt="" loading="lazy" /> : null}
                     <p>{item.body}</p>
                     <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
                   </div>

@@ -36,6 +36,34 @@ controller.markRead = async (req, res, next) => {
   }
 };
 
+controller.createBroadcast = async (req, res, next) => {
+  try {
+    const { title, body, imageUrl } = req.body;
+    const recipients = await prisma.user.findMany({
+      where: { isActive: true },
+      select: { id: true },
+    });
+    if (!recipients.length) throw new AppError('There are no active accounts to notify.', 400);
+
+    const result = await prisma.notification.createMany({
+      data: recipients.map((user) => ({
+        userId: user.id,
+        type: 'announcement',
+        title: title.trim(),
+        body: body.trim(),
+        imageUrl: imageUrl || null,
+      })),
+    });
+
+    return res.status(201).json({
+      message: `Notification sent to ${result.count} account${result.count === 1 ? '' : 's'}.`,
+      recipientCount: result.count,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 controller.markAllRead = async (req, res, next) => {
   try {
     const result = await prisma.notification.updateMany({

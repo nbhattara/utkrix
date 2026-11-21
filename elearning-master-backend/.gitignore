@@ -6,3 +6,5 @@ private-uploads/
 npm-debug.log*
 
 /generated/prisma
+.vercel
+.env*

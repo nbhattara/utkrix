@@ -15,6 +15,7 @@ import About from "./sections/About.jsx";
 import MissionVision from "./sections/MissionVision.jsx";
 import Projects from "./sections/Projects.jsx";
 import Courses from "./sections/Courses.jsx";
+import Faqs from "./sections/Faqs.jsx";
 import Contact from "./sections/Contact.jsx";
 import AuthPage from "./components/AuthPage.jsx";
 import Dashboard from "./components/Dashboard.jsx";
@@ -121,6 +122,7 @@ export default function App() {
             <MissionVision />
             <Courses />
             <Projects />
+            <Faqs />
             <Contact />
           </>
         )}

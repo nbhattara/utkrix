@@ -26,6 +26,7 @@ export const navItems = [
   { id: "about", label: "About" },
   { id: "courses", label: "Courses" },
   { id: "projects", label: "Projects" },
+  { id: "faqs", label: "FAQs" },
   { id: "contact", label: "Contact" },
 ];
 

@@ -4,6 +4,7 @@ import { useAuth } from "../auth/AuthContext.jsx";
 import ClassroomWorkspace from "./ClassroomWorkspace.jsx";
 import LearningWorkspace from "./LearningWorkspace.jsx";
 import NotificationCenter from "./NotificationCenter.jsx";
+import AdminNotificationComposer from "./AdminNotificationComposer.jsx";
 
 const blankCourse = {
   title: "",
@@ -1288,7 +1289,11 @@ export default function Dashboard() {
 
   const activeSectionLabel = sections.find((section) => section.id === activeSection)?.label || "Dashboard";
   const renderWorkspace = () => {
-    if (activeSection === "notifications") return <NotificationCenter onNotice={setNotice} />;
+    if (activeSection === "notifications") {
+      return user.role === "admin"
+        ? <><AdminNotificationComposer onNotice={setNotice} /><NotificationCenter onNotice={setNotice} /></>
+        : <NotificationCenter onNotice={setNotice} />;
+    }
     if (user.role === "admin") {
       switch (activeSection) {
         case "overview": return <AdminOverview />;
