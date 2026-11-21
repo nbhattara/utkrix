@@ -1,64 +1,12 @@
-node_modules
-dist
-.DS_Store
-*.log
-.env
-.env.*
-!.env.example
-
-.env
-.env.*
-!.env.example
 node_modules/
 dist/
 build/
 coverage/
-.git/
-
-.env
-.env.*
-!.env.example
-node_modules/
-dist/
-build/
-coverage/
-.git/
-
-.env
-.env.*
-!.env.example
-node_modules/
-dist/
-build/
-coverage/
-.git/
-
-.env
-.env.*
-!.env.example
-node_modules/
-dist/
-build/
-coverage/
-.git/
-
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Logs
 logs/
-*.log
-
-# Temporary files
 tmp/
-
-# Private uploads
 private-uploads/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
