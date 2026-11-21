@@ -77,9 +77,7 @@ export default function App() {
       <main id="main" tabIndex={-1}>
         {isDashboard ? (
           <ExternalRedirect to={EMPLOYEES_URL} />
-        ) : isAuthRedirect ? (
-          <ExternalRedirect to={authRedirectTo} />
-        ) : isAuthCallback ? (
+        ) : isAuthRedirect || isAuthCallback ? (
           <AuthPage page={page} query={query} />
         ) : isLegal ? (
           <DocumentPage doc={legalDocs[page]} slug={page} />
