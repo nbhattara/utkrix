@@ -53,3 +53,24 @@ tmp/
 
 # Private uploads
 private-uploads/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+
+# Private uploads
+private-uploads/
