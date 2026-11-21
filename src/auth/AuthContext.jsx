@@ -20,6 +20,7 @@ function readSession() {
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(readSession);
+  const [ready, setReady] = useState(() => Boolean(readSession()));
 
 
   const signOut = useCallback(() => {
@@ -39,9 +40,9 @@ export function AuthProvider({ children }) {
   // Throttled via sessionStorage so StrictMode double-mounts and quick
   // reloads don't burn through the refresh rate limit.
   useEffect(() => {
-    if (session) return;
+    if (session) { setReady(true); return; }
     const attemptedAt = Number(sessionStorage.getItem("utkrix-refresh-attempt") || 0);
-    if (Date.now() - attemptedAt < 60_000) return;
+    if (Date.now() - attemptedAt < 60_000) { setReady(true); return; }
     sessionStorage.setItem("utkrix-refresh-attempt", String(Date.now()));
     postApi("/auth/refresh", {})
       .then((result) => {
@@ -53,10 +54,12 @@ export function AuthProvider({ children }) {
           setSession(nextSession);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setReady(true));
   }, [session]);
 
   const value = useMemo(() => ({
+    ready,
     user: session?.user || null,
     token: session?.token || null,
     signIn: ({ token, accessToken, user, csrfToken }) => {
@@ -68,7 +71,7 @@ export function AuthProvider({ children }) {
       setSession(nextSession);
     },
     signOut,
-  }), [session, signOut]);
+  }), [session, signOut, ready]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

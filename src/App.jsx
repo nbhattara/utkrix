@@ -17,10 +17,11 @@ import Projects from "./sections/Projects.jsx";
 import Courses from "./sections/Courses.jsx";
 import Contact from "./sections/Contact.jsx";
 import AuthPage from "./components/AuthPage.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 import SupportMessenger from "./components/SupportMessenger.jsx";
+import { useAuth } from "./auth/AuthContext.jsx";
 
 const LOGIN_URL = (import.meta.env.VITE_LOGIN_URL || "http://login.lvh.me:5173").replace(/\/+$/, "");
-const EMPLOYEES_URL = (import.meta.env.VITE_EMPLOYEES_URL || "http://employees.lvh.me:5173").replace(/\/+$/, "");
 
 const AUTH_ROUTE_MAP = {
   login: "/login",
@@ -29,13 +30,6 @@ const AUTH_ROUTE_MAP = {
   "verify-email": "/verify-email",
   "password-reset": "/reset-password",
 };
-
-function ExternalRedirect({ to }) {
-  useEffect(() => {
-    window.location.replace(to);
-  }, [to]);
-  return null;
-}
 
 // Legal pages: route (hash) -> document. Add more here if needed.
 const legalDocs = {
@@ -47,6 +41,7 @@ const navIds = navItems.map((n) => n.id);
 export default function App() {
   const { theme, toggle } = useTheme();
   const { page, anchor, query } = useHashRoute();
+  const { ready: authReady } = useAuth();
 
   // The login.* subdomain should open the sign-in page, not the landing page.
   useEffect(() => {
@@ -85,7 +80,7 @@ export default function App() {
       <Header theme={theme} onToggleTheme={toggle} activeId={isLegal ? null : activeId} />
       <main id="main" tabIndex={-1}>
         {isDashboard ? (
-          <ExternalRedirect to={EMPLOYEES_URL} />
+          authReady ? <Dashboard /> : <p className="collection-status" role="status">Loading your workspace…</p>
         ) : isAuthRedirect || isAuthCallback ? (
           <AuthPage page={page} query={query} />
         ) : isLegal ? (
