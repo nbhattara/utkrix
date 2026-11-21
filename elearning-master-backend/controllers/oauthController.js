@@ -6,6 +6,7 @@ const { issueAccessToken } = require('../services/authService');
 const { assertEmailConfigured, sendEmailVerification } = require('../services/emailService');
 const { createRefreshToken } = require('../services/refreshTokenService');
 const { generateCSRFToken } = require('../middleware/csrfMiddleware');
+const { resolveCookieDomain } = require('../utils/cookieDomain');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 
@@ -437,7 +438,7 @@ controller.exchange = async (req, res) => {
     );
 
     const isProduction = process.env.NODE_ENV === 'production';
-    const cookieDomain = process.env.COOKIE_DOMAIN || undefined;
+    const cookieDomain = resolveCookieDomain(req);
     const cookieSecure = isProduction ? true : false;
     const cookieSameSite = process.env.COOKIE_SAME_SITE || 'lax';
 
