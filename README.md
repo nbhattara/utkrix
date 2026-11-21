@@ -151,7 +151,7 @@ All three frontends can run behind subdomain-style URLs via the dev gateway:
 node scripts/dev-gateway.js   # serves :5173 and routes by hostname
 ```
 
-- `abc.localhost:5173` / `localhost:5173` — main marketing site
+- `localhost:5173` / `localhost:5173` — main marketing site
 - `login.localhost:5173` / `login.lvh.me:5173` — login & registration app
 - `employees.localhost:5173` / `employees.lvh.me:5173` — employee/student portal
 - `admin.localhost:5173` — admin portal (currently same app as employees)

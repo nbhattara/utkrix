@@ -1,6 +1,6 @@
 # Centralized Authentication Deployment Guide
 
-This guide covers the deployment of the centralized authentication system with login.abc.com as the dedicated authentication subdomain.
+This guide covers the deployment of the centralized authentication system with login.nikesh-bhattarai.com.np as the dedicated authentication subdomain.
 
 ## Table of Contents
 
@@ -19,24 +19,24 @@ This guide covers the deployment of the centralized authentication system with l
 
 ### Required DNS Records
 
-For the domain `abc.com`, configure the following DNS records:
+For the domain `nikesh-bhattarai.com.np`, configure the following DNS records:
 
 ```
 # Main website
-abc.com          A      <your-server-ip>
-www.abc.com      CNAME  abc.com
+nikesh-bhattarai.com.np          A      <your-server-ip>
+www.nikesh-bhattarai.com.np      CNAME  nikesh-bhattarai.com.np
 
 # Authentication subdomain
-login.abc.com    A      <your-auth-frontend-ip>
+login.nikesh-bhattarai.com.np    A      <your-auth-frontend-ip>
 
 # Backend API
-api.abc.com      A      <your-backend-api-ip>
+api.nikesh-bhattarai.com.np      A      <your-backend-api-ip>
 
 # Employee portal
-employees.abc.com A      <your-employee-portal-ip>
+employees.nikesh-bhattarai.com.np A      <your-employee-portal-ip>
 
 # Admin portal
-admin.abc.com    A      <your-admin-portal-ip>
+admin.nikesh-bhattarai.com.np    A      <your-admin-portal-ip>
 ```
 
 ### Notes
@@ -98,7 +98,7 @@ pm2 save
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name api.abc.com;
+    server_name api.nikesh-bhattarai.com.np;
 
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -128,14 +128,14 @@ server {
 
 2. **Configure environment variables** in Vercel:
    ```
-   VITE_API_URL=https://api.abc.com
-   VITE_MAIN_SITE_URL=https://abc.com
-   VITE_EMPLOYEES_URL=https://employees.abc.com
-   VITE_ADMIN_URL=https://admin.abc.com
+   VITE_API_URL=https://api.nikesh-bhattarai.com.np
+   VITE_MAIN_SITE_URL=https://nikesh-bhattarai.com.np
+   VITE_EMPLOYEES_URL=https://employees.nikesh-bhattarai.com.np
+   VITE_ADMIN_URL=https://admin.nikesh-bhattarai.com.np
    ```
 
 3. **Configure custom domain**:
-   - Add `login.abc.com` as a custom domain
+   - Add `login.nikesh-bhattarai.com.np` as a custom domain
    - Vercel will provide DNS records to add
 
 4. **Deploy**:
@@ -184,16 +184,16 @@ JWT_ACCESS_SECRET=your_access_secret_min_32_bytes
 JWT_REFRESH_SECRET=your_refresh_secret_min_32_bytes
 
 # CORS Origins (comma-separated, no spaces)
-CORS_ORIGINS=https://abc.com,https://www.abc.com,https://login.abc.com,https://employees.abc.com,https://admin.abc.com
+CORS_ORIGINS=https://nikesh-bhattarai.com.np,https://www.nikesh-bhattarai.com.np,https://login.nikesh-bhattarai.com.np,https://employees.nikesh-bhattarai.com.np,https://admin.nikesh-bhattarai.com.np
 
 # Cookie Configuration
-COOKIE_DOMAIN=.abc.com
+COOKIE_DOMAIN=.nikesh-bhattarai.com.np
 COOKIE_SECURE=true
 COOKIE_SAME_SITE=lax
 
 # Domain Configuration
-AUTH_DOMAIN=https://login.abc.com
-FRONTEND_URL=https://abc.com
+AUTH_DOMAIN=https://login.nikesh-bhattarai.com.np
+FRONTEND_URL=https://nikesh-bhattarai.com.np
 
 # Email Configuration
 SMTP_HOST=smtp.gmail.com
@@ -205,7 +205,7 @@ SMTP_FROM=UtkriX Technologies <your-email@gmail.com>
 EMAIL_BRAND_NAME=UtkriX Technologies
 
 # OAuth Configuration (if using OAuth)
-OAUTH_CALLBACK_BASE_URL=https://api.abc.com/api/v1/auth/oauth
+OAUTH_CALLBACK_BASE_URL=https://api.nikesh-bhattarai.com.np/api/v1/auth/oauth
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 FACEBOOK_APP_ID=your-facebook-app-id
@@ -220,10 +220,10 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 Create a `.env.production` file in the login-frontend directory:
 
 ```env
-VITE_API_URL=https://api.abc.com
-VITE_MAIN_SITE_URL=https://abc.com
-VITE_EMPLOYEES_URL=https://employees.abc.com
-VITE_ADMIN_URL=https://admin.abc.com
+VITE_API_URL=https://api.nikesh-bhattarai.com.np
+VITE_MAIN_SITE_URL=https://nikesh-bhattarai.com.np
+VITE_EMPLOYEES_URL=https://employees.nikesh-bhattarai.com.np
+VITE_ADMIN_URL=https://admin.nikesh-bhattarai.com.np
 ```
 
 ### Security Notes
@@ -248,18 +248,18 @@ The backend is configured to:
 ### Allowed Origins
 
 Production origins must be explicitly listed:
-- `https://abc.com`
-- `https://www.abc.com`
-- `https://login.abc.com`
-- `https://employees.abc.com`
-- `https://admin.abc.com`
+- `https://nikesh-bhattarai.com.np`
+- `https://www.nikesh-bhattarai.com.np`
+- `https://login.nikesh-bhattarai.com.np`
+- `https://employees.nikesh-bhattarai.com.np`
+- `https://admin.nikesh-bhattarai.com.np`
 
 ### Testing CORS
 
 ```bash
 # Test preflight request
-curl -X OPTIONS https://api.abc.com/api/v1/auth/login \
-  -H "Origin: https://login.abc.com" \
+curl -X OPTIONS https://api.nikesh-bhattarai.com.np/api/v1/auth/login \
+  -H "Origin: https://login.nikesh-bhattarai.com.np" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: Content-Type" \
   -v
@@ -271,7 +271,7 @@ curl -X OPTIONS https://api.abc.com/api/v1/auth/login \
 
 | Setting | Development | Production |
 |---------|-------------|------------|
-| Domain | (not set) | `.abc.com` |
+| Domain | (not set) | `.nikesh-bhattarai.com.np` |
 | HttpOnly | `true` | `true` |
 | Secure | `false` | `true` |
 | SameSite | `lax` | `lax` |
@@ -285,11 +285,11 @@ curl -X OPTIONS https://api.abc.com/api/v1/auth/login \
 
 ### Cross-Subdomain Cookie Sharing
 
-With `COOKIE_DOMAIN=.abc.com`, cookies set on `login.abc.com` will be accessible on:
-- `abc.com`
-- `www.abc.com`
-- `employees.abc.com`
-- `admin.abc.com`
+With `COOKIE_DOMAIN=.nikesh-bhattarai.com.np`, cookies set on `login.nikesh-bhattarai.com.np` will be accessible on:
+- `nikesh-bhattarai.com.np`
+- `www.nikesh-bhattarai.com.np`
+- `employees.nikesh-bhattarai.com.np`
+- `admin.nikesh-bhattarai.com.np`
 
 ## HTTPS Requirements
 
@@ -306,7 +306,7 @@ HTTPS is **required** for production deployment because:
 
 1. **Let's Encrypt** (Free):
    ```bash
-   sudo certbot --nginx -d api.abc.com -d login.abc.com
+   sudo certbot --nginx -d api.nikesh-bhattarai.com.np -d login.nikesh-bhattarai.com.np
    ```
 
 2. **Cloudflare SSL** (Free tier available)
@@ -320,7 +320,7 @@ Configure all HTTP traffic to redirect to HTTPS:
 ```nginx
 server {
     listen 80;
-    server_name abc.com www.abc.com login.abc.com api.abc.com;
+    server_name nikesh-bhattarai.com.np www.nikesh-bhattarai.com.np login.nikesh-bhattarai.com.np api.nikesh-bhattarai.com.np;
     return 301 https://$host$request_uri;
 }
 ```
@@ -330,21 +330,21 @@ server {
 ### 1. User Attempts to Access Protected Resource
 
 ```
-User → employees.abc.com/dashboard
+User → employees.nikesh-bhattarai.com.np/dashboard
 ```
 
 ### 2. Redirect to Login
 
 ```
-employees.abc.com → redirect to login.abc.com?redirect=https://employees.abc.com/dashboard
+employees.nikesh-bhattarai.com.np → redirect to login.nikesh-bhattarai.com.np?redirect=https://employees.nikesh-bhattarai.com.np/dashboard
 ```
 
 ### 3. User Authenticates
 
 ```
-User → login.abc.com/login
+User → login.nikesh-bhattarai.com.np/login
 User enters credentials
-POST https://api.abc.com/api/v1/auth/login
+POST https://api.nikesh-bhattarai.com.np/api/v1/auth/login
 ```
 
 ### 4. Backend Sets Cookies
@@ -359,13 +359,13 @@ Backend response includes:
 ### 5. Redirect Back
 
 ```
-login.abc.com → redirect to https://employees.abc.com/dashboard
+login.nikesh-bhattarai.com.np → redirect to https://employees.nikesh-bhattarai.com.np/dashboard
 ```
 
 ### 6. Access Protected Resource
 
 ```
-employees.abc.com → GET https://api.abc.com/api/v1/dashboard
+employees.nikesh-bhattarai.com.np → GET https://api.nikesh-bhattarai.com.np/api/v1/dashboard
 Headers: Authorization: Bearer <accessToken>
 ```
 
@@ -373,7 +373,7 @@ Headers: Authorization: Bearer <accessToken>
 
 ```
 If accessToken expires:
-Frontend → POST https://api.abc.com/api/v1/auth/refresh
+Frontend → POST https://api.nikesh-bhattarai.com.np/api/v1/auth/refresh
 Headers: X-CSRF-Token: <csrf_token>
 Cookie: refreshToken=<refreshToken>
 
@@ -386,7 +386,7 @@ Backend response:
 
 ```
 User clicks logout
-Frontend → POST https://api.abc.com/api/v1/auth/logout
+Frontend → POST https://api.nikesh-bhattarai.com.np/api/v1/auth/logout
 Headers: X-CSRF-Token: <csrf_token>
 Cookie: refreshToken=<refreshToken>
 
@@ -399,26 +399,26 @@ Backend clears cookies and revokes tokens
 
 ```bash
 # Test each subdomain
-nslookup login.abc.com
-nslookup api.abc.com
-nslookup employees.abc.com
-nslookup admin.abc.com
+nslookup login.nikesh-bhattarai.com.np
+nslookup api.nikesh-bhattarai.com.np
+nslookup employees.nikesh-bhattarai.com.np
+nslookup admin.nikesh-bhattarai.com.np
 ```
 
 ### 2. Test HTTPS
 
 ```bash
 # Test SSL certificate
-curl -I https://login.abc.com
-curl -I https://api.abc.com
+curl -I https://login.nikesh-bhattarai.com.np
+curl -I https://api.nikesh-bhattarai.com.np
 ```
 
 ### 3. Test Registration
 
 ```bash
-curl -X POST https://api.abc.com/api/v1/auth/register \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/register \
   -H "Content-Type: application/json" \
-  -H "Origin: https://login.abc.com" \
+  -H "Origin: https://login.nikesh-bhattarai.com.np" \
   -d '{"name":"Test User","email":"test@example.com","password":"testpassword123456"}' \
   -v
 ```
@@ -426,9 +426,9 @@ curl -X POST https://api.abc.com/api/v1/auth/register \
 ### 4. Test Login
 
 ```bash
-curl -X POST https://api.abc.com/api/v1/auth/login \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -H "Origin: https://login.abc.com" \
+  -H "Origin: https://login.nikesh-bhattarai.com.np" \
   -c cookies.txt \
   -d '{"email":"test@example.com","password":"testpassword123456"}' \
   -v
@@ -437,8 +437,8 @@ curl -X POST https://api.abc.com/api/v1/auth/login \
 ### 5. Test Token Refresh
 
 ```bash
-curl -X POST https://api.abc.com/api/v1/auth/refresh \
-  -H "Origin: https://login.abc.com" \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/refresh \
+  -H "Origin: https://login.nikesh-bhattarai.com.np" \
   -b cookies.txt \
   -c cookies.txt \
   -v
@@ -447,8 +447,8 @@ curl -X POST https://api.abc.com/api/v1/auth/refresh \
 ### 6. Test Logout
 
 ```bash
-curl -X POST https://api.abc.com/api/v1/auth/logout \
-  -H "Origin: https://login.abc.com" \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/logout \
+  -H "Origin: https://login.nikesh-bhattarai.com.np" \
   -b cookies.txt \
   -c cookies.txt \
   -v
@@ -458,14 +458,14 @@ curl -X POST https://api.abc.com/api/v1/auth/logout \
 
 ```bash
 # Test from main site
-curl -X POST https://api.abc.com/api/v1/auth/login \
-  -H "Origin: https://abc.com" \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/login \
+  -H "Origin: https://nikesh-bhattarai.com.np" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"testpassword123456"}' \
   -v
 
 # Test from unauthorized origin (should fail)
-curl -X POST https://api.abc.com/api/v1/auth/login \
+curl -X POST https://api.nikesh-bhattarai.com.np/api/v1/auth/login \
   -H "Origin: https://evil.com" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"testpassword123456"}' \
@@ -474,8 +474,8 @@ curl -X POST https://api.abc.com/api/v1/auth/login \
 
 ### 8. Test Cross-Subdomain Cookies
 
-1. Login on `login.abc.com`
-2. Navigate to `employees.abc.com`
+1. Login on `login.nikesh-bhattarai.com.np`
+2. Navigate to `employees.nikesh-bhattarai.com.np`
 3. Check that cookies are accessible
 4. Verify API calls work without re-authentication
 
@@ -512,14 +512,14 @@ curl -X POST https://api.abc.com/api/v1/auth/login \
 
 ### Phase 3: Frontend Deployment
 
-1. **Deploy login.abc.com frontend**
+1. **Deploy login.nikesh-bhattarai.com.np frontend**
 2. **Configure DNS**
 3. **Test authentication flow**
 4. **Verify cookie behavior**
 
 ### Phase 4: Update Existing Frontends
 
-1. **Update main website** to redirect to login.abc.com
+1. **Update main website** to redirect to login.nikesh-bhattarai.com.np
 2. **Update employee portal** to use centralized auth
 3. **Update admin portal** to use centralized auth
 4. **Remove local auth logic from each frontend**
@@ -582,10 +582,10 @@ curl -X POST https://api.abc.com/api/v1/auth/login \
 
 ### Issue: Cross-subdomain cookies not sharing
 
-**Symptoms**: Cookies set on login.abc.com not accessible on other subdomains
+**Symptoms**: Cookies set on login.nikesh-bhattarai.com.np not accessible on other subdomains
 
 **Solutions**:
-1. Verify `COOKIE_DOMAIN=.abc.com` (with leading dot)
+1. Verify `COOKIE_DOMAIN=.nikesh-bhattarai.com.np` (with leading dot)
 2. Check that all subdomains use HTTPS
 3. Verify SameSite policy allows cross-subdomain
 4. Check browser privacy settings

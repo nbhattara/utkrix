@@ -30,7 +30,7 @@ UtkriX Technologies is a company website + e-learning platform monorepo. It cons
 | ADR-2 | Express 5 + CommonJS backend (`server.js` at root, not `src/`) | Existing codebase convention; minimal churn | ESM rewrite, NestJS | Implemented |
 | ADR-3 | Prisma ORM 5.20 + MySQL (TiDB Cloud in dev/prod) | Type-safe queries, migrations, TiDB compatibility | TypeORM, raw SQL | Implemented |
 | ADR-4 | JWT access tokens (short-lived) + DB-backed refresh tokens in HttpOnly cookies | Secure session restore across apps without storing tokens in JS | Session store, OAuth-only | Implemented |
-| ADR-5 | Cookie-based SSO across subdomains via shared `COOKIE_DOMAIN` | One login serves all apps | Per-app auth, token-in-localStorage | Implemented (requires real domain in prod; `*.vercel.app` is a public suffix and cannot share cookies — see §9) |
+| ADR-5 | Cookie-based SSO across subdomains via shared `COOKIE_DOMAIN` | One login serves all apps | Per-app auth, token-in-localStorage | Implemented (requires real domain in prod; `*.nikesh-bhattarai.com.np` is a public suffix and cannot share cookies — see §9) |
 | ADR-6 | Centralized auth on dedicated `login.*` app; marketing site links out | Clean separation, single credential surface | Auth embedded in main site | Implemented |
 | ADR-7 | Cloudflare R2 (S3 API) for all uploads, replacing local disk | Vercel/serverless has ephemeral disk | Local disk, other object stores | **Partially implemented** — storage service + middleware/controller migration done; presigned direct-upload flow and legacy-file migration still pending (§7) |
 | ADR-8 | One R2 bucket `utkrix` with `public/` and `private/` key prefixes | Simpler billing/management | Two buckets | Implemented in config (`R2_PUBLIC_BUCKET`/`R2_PRIVATE_BUCKET` may point to the same bucket) |
@@ -166,7 +166,7 @@ Exact per-endpoint request/response shapes live in `openapi.json` and route file
 - **Validation:** express-validator on routes; multer MIME+ext checks; object-key traversal guards in storage service.
 - **Logging:** winston → `logs/*.log` locally; console-only on Vercel (`VERCEL` env detected). No secrets/tokens logged.
 
-**Production requirements:** `NODE_ENV=production`, `JWT_SECRET` ≥32B, explicit `CORS_ORIGINS`, `COOKIE_SECURE=true`, real `COOKIE_DOMAIN` (custom domain — `*.vercel.app` cannot share cookies), valid SMTP, OAuth secrets, R2 creds.
+**Production requirements:** `NODE_ENV=production`, `JWT_SECRET` ≥32B, explicit `CORS_ORIGINS`, `COOKIE_SECURE=true`, real `COOKIE_DOMAIN` (custom domain — `*.nikesh-bhattarai.com.np` cannot share cookies), valid SMTP, OAuth secrets, R2 creds.
 
 ---
 
@@ -274,7 +274,7 @@ Backend scripts: `npm run dev` (nodemon), `npm start`, `npm test` (node:test), `
 - **Frontends → Vercel:** three projects (root, `login-frontend/`, `utkrix-tech/`). Set `VITE_*` env vars per §9, deploy, verify API URL.
 - **Backend → Vercel:** project root `elearning-master-backend/`; `api/index.js` + `vercel.json` route all paths to the function. Set all backend env vars in Vercel. ⚠️ Not yet verified live.
 - **Alternative backend hosts:** Render/Railway/VPS run `npm start` unchanged.
-- **DNS/cookies:** cross-subdomain SSO on `*.vercel.app` is impossible (public suffix). Use a custom domain (e.g. `login.example.com`) with `COOKIE_DOMAIN=.example.com`, or keep per-app sessions.
+- **DNS/cookies:** cross-subdomain SSO on `*.nikesh-bhattarai.com.np` is impossible (public suffix). Use a custom domain (e.g. `login.nikesh-bhattarai.com.np`) with `COOKIE_DOMAIN=.nikesh-bhattarai.com.np`, or keep per-app sessions.
 - **Rollback:** frontends — Vercel instant rollback to previous deployment; backend — redeploy previous commit; DB — TiDB point-in-time recovery / snapshot.
 
 ---
