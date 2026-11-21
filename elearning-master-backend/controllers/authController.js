@@ -72,6 +72,7 @@ controller.register = async (req, res) => {
     assertEmailConfigured();
 
     const { name, email, password } = req.body;
+    const role = req.body.role === 'instructor' ? 'instructor' : 'student';
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -82,16 +83,17 @@ controller.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const isInstructor = role === 'instructor';
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: 'student',
+        role,
         tier: 'free',
         emailVerified: false,
-        isApproved: true,
-        approvedAt: new Date(),
+        isApproved: !isInstructor,
+        approvedAt: isInstructor ? null : new Date(),
       },
     });
 

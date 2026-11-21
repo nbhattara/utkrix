@@ -125,6 +125,7 @@ router.post(
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 12 }).withMessage('Password must be at least 12 characters'),
+    body('role').optional().isIn(['student', 'instructor']).withMessage('Role must be student or instructor'),
   ],
   validate,
   authController.register
