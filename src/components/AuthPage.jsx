@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { postApi, startOAuth } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
+import Logo from "./Logo.jsx";
+import PasswordInput from "./PasswordInput.jsx";
 
 const providers = [
   { id: "google", label: "Google", mark: "G" },
@@ -18,6 +20,50 @@ const oauthMessages = {
   invalid_state: "The sign-in request expired or could not be verified. Please try again.",
   email_required: "The provider did not share a usable email address. Choose another sign-in method.",
 };
+
+function AuthShell({ title, description, children }) {
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <Logo className="auth-logo" />
+          <h1 className="auth-title">{title}</h1>
+          {description ? <p className="auth-subtitle">{description}</p> : null}
+        </div>
+        {children}
+      </div>
+      <p className="auth-footer">&copy; {new Date().getFullYear()} UtkriX Technologies. All rights reserved.</p>
+    </div>
+  );
+}
+
+function AuthAlert({ error, success }) {
+  if (error) return <div className="auth-alert auth-alert--error" role="alert">{error}</div>;
+  if (success) return <div className="auth-alert auth-alert--success" role="status">{success}</div>;
+  return null;
+}
+
+function AuthField({ id, name, label, type = "text", value, onChange, required = false, autoComplete, minLength, maxLength, children }) {
+  return (
+    <div className="auth-field">
+      <label htmlFor={id || name} className="auth-label">{label}</label>
+      {children || (
+        <input
+          type={type}
+          id={id || name}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          autoComplete={autoComplete}
+          minLength={minLength}
+          maxLength={maxLength}
+          className="auth-input"
+        />
+      )}
+    </div>
+  );
+}
 
 function SocialSignIn({ disabled, onError }) {
   return (
@@ -47,31 +93,11 @@ function SocialSignIn({ disabled, onError }) {
   );
 }
 
-function AuthLayout({ title, description, children }) {
-  return (
-    <section className="auth-section" aria-labelledby="auth-title">
-      <div className="auth-card">
-        <div className="auth-card__intro">
-          <span className="auth-eyebrow">UTKRIX LEARNING</span>
-          <h1 id="auth-title">{title}</h1>
-          <p>{description}</p>
-        </div>
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function AuthMessage({ error, success }) {
-  if (error) return <p className="auth-message auth-message--error" role="alert">{error}</p>;
-  if (success) return <p className="auth-message auth-message--success" role="status">{success}</p>;
-  return null;
-}
-
 function LoginPage({ query }) {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(
     oauthMessages[query.get("oauthError")] || (query.has("oauthError") ? "Social sign-in could not be completed. Please try again." : "")
   );
@@ -109,19 +135,32 @@ function LoginPage({ query }) {
   };
 
   return (
-    <AuthLayout title="Welcome back" description="Sign in to continue learning with UtkriX.">
-      <AuthMessage error={error} success={success} />
+    <AuthShell title="Welcome back" description="Sign in to continue learning with UtkriX.">
+      <AuthAlert error={error} success={success} />
       <form className="auth-form" onSubmit={submit}>
-        <label className="field">
-          <span>Email address</span>
-          <input type="email" name="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
-        </label>
-        <label className="field">
-          <span>Password</span>
-          <input type="password" name="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
-        </label>
-        <a className="auth-form__forgot" href="#/forgot-password">Forgot password?</a>
-        <button className="btn btn--primary auth-form__submit" type="submit" disabled={loading}>
+        <AuthField
+          id="email" name="email" label="Email address" type="email"
+          autoComplete="email" required maxLength={254}
+          value={email} onChange={(event) => setEmail(event.target.value)}
+        />
+        <PasswordInput
+          id="password" name="password" label="Password"
+          autoComplete="current-password" required
+          value={password} onChange={(event) => setPassword(event.target.value)}
+        />
+        <div className="auth-row">
+          <label className="auth-remember">
+            <input
+              type="checkbox"
+              className="auth-checkbox"
+              checked={rememberMe}
+              onChange={(event) => setRememberMe(event.target.checked)}
+            />
+            <span className="auth-remember-label">Remember me</span>
+          </label>
+          <a className="auth-link" href="#/forgot-password">Forgot password?</a>
+        </div>
+        <button className="auth-btn" type="submit" disabled={loading}>
           {loading ? "Signing in…" : "Sign in"}
         </button>
         {error.includes("Verify your email") && (
@@ -131,8 +170,8 @@ function LoginPage({ query }) {
         )}
       </form>
       <SocialSignIn disabled={loading} onError={setError} />
-      <p className="auth-switch">New to UtkriX? <a href="#/register">Create an account</a></p>
-    </AuthLayout>
+      <p className="auth-switch">New to UtkriX? <a className="auth-link" href="#/register">Create an account</a></p>
+    </AuthShell>
   );
 }
 
@@ -141,6 +180,8 @@ function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
 
   const submit = async (event) => {
     event.preventDefault();
@@ -167,39 +208,26 @@ function RegisterPage() {
   };
 
   return (
-    <AuthLayout title="Create your account" description="Join UtkriX and start learning at your own pace.">
-      <AuthMessage error={error} success={success} />
+    <AuthShell title="Create your account" description="Join UtkriX and start learning at your own pace.">
+      <AuthAlert error={error} success={success} />
       <form className="auth-form" onSubmit={submit}>
-        <label className="field">
-          <span>Full name</span>
-          <input type="text" name="name" autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-        </label>
-        <label className="field">
-          <span>Email address</span>
-          <input type="email" name="email" autoComplete="email" required maxLength={254} value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
-        </label>
-        <label className="field">
-          <span>I want to join as</span>
-          <select value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
+        <AuthField id="name" name="name" label="Full name" autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={update("name")} />
+        <AuthField id="email" name="email" label="Email address" type="email" autoComplete="email" required maxLength={254} value={form.email} onChange={update("email")} />
+        <AuthField id="role" name="role" label="I want to join as" value={form.role} onChange={update("role")}>
+          <select className="auth-input" value={form.role} onChange={update("role")}>
             <option value="student">Student</option>
             <option value="instructor">Instructor</option>
           </select>
-        </label>
-        <label className="field">
-          <span>Password <small className="field__opt">At least 12 characters</small></span>
-          <input type="password" name="password" autoComplete="new-password" required minLength={12} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} />
-        </label>
-        <label className="field">
-          <span>Confirm password</span>
-          <input type="password" name="confirmPassword" autoComplete="new-password" required minLength={12} value={form.confirmPassword} onChange={(event) => setForm({ ...form, confirmPassword: event.target.value })} />
-        </label>
-        <button className="btn btn--primary auth-form__submit" type="submit" disabled={loading}>
+        </AuthField>
+        <PasswordInput id="password" name="password" label="Password" autoComplete="new-password" required minLength={12} value={form.password} onChange={update("password")} />
+        <PasswordInput id="confirmPassword" name="confirmPassword" label="Confirm password" autoComplete="new-password" required minLength={12} value={form.confirmPassword} onChange={update("confirmPassword")} />
+        <button className="auth-btn" type="submit" disabled={loading}>
           {loading ? "Creating account…" : "Create account"}
         </button>
       </form>
       <SocialSignIn disabled={loading} onError={setError} />
-      <p className="auth-switch">Already have an account? <a href="#/login">Sign in</a></p>
-    </AuthLayout>
+      <p className="auth-switch">Already have an account? <a className="auth-link" href="#/login">Sign in</a></p>
+    </AuthShell>
   );
 }
 
@@ -225,19 +253,16 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <AuthLayout title="Reset your password" description="We’ll send a reset link if a verified account exists for that email.">
-      <AuthMessage error={error} success={success} />
+    <AuthShell title="Reset your password" description="We’ll send a reset link if a verified account exists for that email.">
+      <AuthAlert error={error} success={success} />
       <form className="auth-form" onSubmit={submit}>
-        <label className="field">
-          <span>Email address</span>
-          <input type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
-        </label>
-        <button className="btn btn--primary auth-form__submit" type="submit" disabled={loading}>
+        <AuthField id="email" name="email" label="Email address" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
+        <button className="auth-btn" type="submit" disabled={loading}>
           {loading ? "Sending…" : "Send reset link"}
         </button>
       </form>
-      <p className="auth-switch"><a href="#/login">Back to sign in</a></p>
-    </AuthLayout>
+      <p className="auth-switch"><a className="auth-link" href="#/login">Back to sign in</a></p>
+    </AuthShell>
   );
 }
 
@@ -262,17 +287,17 @@ function VerifyEmailPage({ query }) {
   };
 
   return (
-    <AuthLayout title="Verify your email" description="Confirm your email address to activate your account.">
-      <AuthMessage error={error} success={success} />
+    <AuthShell title="Verify your email" description="Confirm your email address to activate your account.">
+      <AuthAlert error={error} success={success} />
       {token ? (
-        <button className="btn btn--primary auth-form__submit" type="button" disabled={loading || Boolean(success)} onClick={verify}>
+        <button className="auth-btn" type="button" disabled={loading || Boolean(success)} onClick={verify}>
           {loading ? "Verifying…" : success ? "Email verified" : "Verify email"}
         </button>
       ) : (
-        <p className="auth-message auth-message--error" role="alert">This verification link is missing its token. Request another email from the sign-in page.</p>
+        <div className="auth-alert auth-alert--error" role="alert">This verification link is missing its token. Request another email from the sign-in page.</div>
       )}
-      <p className="auth-switch"><a href="#/login">Continue to sign in</a></p>
-    </AuthLayout>
+      <p className="auth-switch"><a className="auth-link" href="#/login">Continue to sign in</a></p>
+    </AuthShell>
   );
 }
 
@@ -304,27 +329,21 @@ function PasswordResetPage({ query }) {
   };
 
   return (
-    <AuthLayout title="Choose a new password" description="Use at least 12 characters for your new password.">
-      <AuthMessage error={error} success={success} />
+    <AuthShell title="Choose a new password" description="Use at least 12 characters for your new password.">
+      <AuthAlert error={error} success={success} />
       {token ? (
         <form className="auth-form" onSubmit={submit}>
-          <label className="field">
-            <span>New password</span>
-            <input type="password" autoComplete="new-password" required minLength={12} value={password} onChange={(event) => setPassword(event.target.value)} />
-          </label>
-          <label className="field">
-            <span>Confirm new password</span>
-            <input type="password" autoComplete="new-password" required minLength={12} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
-          </label>
-          <button className="btn btn--primary auth-form__submit" type="submit" disabled={loading || Boolean(success)}>
+          <PasswordInput id="password" name="password" label="New password" autoComplete="new-password" required minLength={12} value={password} onChange={(event) => setPassword(event.target.value)} />
+          <PasswordInput id="confirmPassword" name="confirmPassword" label="Confirm new password" autoComplete="new-password" required minLength={12} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+          <button className="auth-btn" type="submit" disabled={loading || Boolean(success)}>
             {loading ? "Updating…" : "Update password"}
           </button>
         </form>
       ) : (
-        <p className="auth-message auth-message--error" role="alert">This reset link is missing its token. Request a new one from the sign-in page.</p>
+        <div className="auth-alert auth-alert--error" role="alert">This reset link is missing its token. Request a new one from the sign-in page.</div>
       )}
-      <p className="auth-switch"><a href="#/login">Back to sign in</a></p>
-    </AuthLayout>
+      <p className="auth-switch"><a className="auth-link" href="#/login">Back to sign in</a></p>
+    </AuthShell>
   );
 }
 
@@ -352,11 +371,11 @@ function OAuthCallbackPage({ query }) {
   }, [query, signIn]);
 
   return (
-    <AuthLayout title={error ? "Sign-in could not finish" : "Finishing sign-in"} description={error ? "Please try again or choose another sign-in method." : "Securely completing your sign-in…"}>
-      <AuthMessage error={error} />
-      {error && <a className="btn btn--primary auth-form__submit" href="#/login">Back to sign in</a>}
+    <AuthShell title={error ? "Sign-in could not finish" : "Finishing sign-in"} description={error ? "Please try again or choose another sign-in method." : "Securely completing your sign-in…"}>
+      <AuthAlert error={error} />
+      {error && <a className="auth-btn auth-btn--ghost" href="#/login">Back to sign in</a>}
       {!error && <p className="collection-status" role="status">Please wait while we verify your account.</p>}
-    </AuthLayout>
+    </AuthShell>
   );
 }
 
